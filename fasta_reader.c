@@ -48,7 +48,6 @@ size_t read_fasta_file(char *file, Sequence ***hash, size_t hash_size)
     char *sequence_id_blank = NULL;
     char *sequence = NULL;
     size_t max_sequence_length = 0;
-    fpos_t file_start = 0;
 
     FILE *open_file = fopen(file, "r");
     while (fgets(buffer, LINE, open_file))
@@ -73,7 +72,9 @@ size_t read_fasta_file(char *file, Sequence ***hash, size_t hash_size)
     sequence = malloc(sizeof(char) * (max_sequence_length + 1));
     *sequence = 0;
     create_hash(hash, hash_size);
-    fsetpos(open_file, &file_start);
+
+    long long file_start = 0;
+    fsetpos(open_file, (const fpos_t *)&file_start);
 
     while (fgets(buffer, LINE, open_file))
     {

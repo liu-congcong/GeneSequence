@@ -9,7 +9,7 @@ Clone and compile as follows:
 ```shell
 git clone https://github.com/liu-congcong/GeneSequence.git
 cd GeneSequence
-gcc *.c -o gene_sequence
+gcc *.c -o gene_sequence -lm
 ```
 
 ## Usage
