@@ -1,12 +1,12 @@
 # GeneSequence
 
-Generate processed RNA sequences, CDS sequences and translated protein sequences of all transcripts.
+Generate processed RNA sequences, CDS sequences and translated protein sequences of all transcripts:
 
-* >X_**transcript**: processed RNA sequence of transcript X
+* X_**transcript**: processed RNA sequence of transcript X
 
-* >X_**cds**: CDS sequence of transcript X
+* X_**cds**: CDS sequence of transcript X
 
-* >X_**protein**: protein sequence of transcript X
+* X_**protein**: protein sequence of transcript X
 
 ## Installation
 
