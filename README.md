@@ -1,10 +1,14 @@
 # GeneSequence
 
-Input FASTA and GFF3 files, and output a FASTA file containing all transcripts, cds sequences and translated proteins.
+Generate processed RNA sequences, CDS sequences and translated protein sequences of all transcripts.
+
+* >X_**transcript**: processed RNA sequence of transcript X
+
+* >X_**cds**: CDS sequence of transcript X
+
+* >X_**protein**: protein sequence of transcript X
 
 ## Installation
-
-Clone and compile as follows:
 
 ```shell
 git clone https://github.com/liu-congcong/GeneSequence.git
