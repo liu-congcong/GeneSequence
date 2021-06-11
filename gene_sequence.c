@@ -171,7 +171,7 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                 printf(">%s_cds\n", transcript_node->transcript);
                 printf("%s%s\n", cds_prefix, buffer);
 
-                protein_prefix[!phase ? 0 : 1] = 0;
+                protein_prefix[phase ? 1 : 0] = 0;
                 size_t protein_offset = 0;
                 while (protein_offset < buffer_offset / 3)
                 {
