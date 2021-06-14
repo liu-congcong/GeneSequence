@@ -82,7 +82,7 @@ int revcom(char *string, size_t string_length)
     return 0;
 }
 
-int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long hash_size, size_t max_sequence_length)
+int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long hash_size, size_t max_sequence_length, int type)
 {
     char *buffer = malloc(sizeof(char) * (max_sequence_length + 1));
     char *protein = malloc(sizeof(char) * (max_sequence_length / 3 + 1));
@@ -104,7 +104,7 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
             short phase = 0;
             for (Element *element_node = transcript_node->element; element_node; element_node = element_node->next)
             {
-                if (element_node->type) // cds
+                if (element_node->type && type) // cds
                 {
                     cds_positions[cds_index] = element_node->start;
                     cds_positions[cds_index + 1] = element_node->end;
@@ -120,38 +120,46 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                     };
                     cds_index += 2;
                 }
-                else
+                else if ((!element_node->type) && (!type))
                 {
                     exon_positions[exon_index] = element_node->start;
                     exon_positions[exon_index + 1] = element_node->end;
                     exon_index += 2;
                 };
             };
-            qsort(exon_positions, 2 * transcript_node->exon_number, sizeof(size_t), compare);
-            qsort(cds_positions, 2 * transcript_node->cds_number, sizeof(size_t), compare);
+            if (!type)
+            {
+                qsort(exon_positions, 2 * transcript_node->exon_number, sizeof(size_t), compare);
+            }
+            else
+            {
+                qsort(cds_positions, 2 * transcript_node->cds_number, sizeof(size_t), compare);
+            };
             // printf("transcript: %s, #exon: %lu, #cds: %lu\n", transcript_node->transcript, transcript_node->exon_number, transcript_node->cds_number);
-            
-            size_t buffer_offset = 0;
+
             size_t element_length;
+            size_t buffer_offset;
 
-            /* Exon */
-            for (exon_index = 0; exon_index < 2 * transcript_node->exon_number; exon_index += 2)
+            if (!type) // transcript
             {
-                // printf("exon: %lu %lu\n", exon_positions[exon_index], exon_positions[exon_index + 1]);
-                element_length = exon_positions[exon_index + 1] - exon_positions[exon_index] + 1;
-                memcpy(buffer + buffer_offset, sequence + exon_positions[exon_index] - 1, element_length);
-                buffer_offset += element_length;
-            };
-            buffer[buffer_offset] = 0;
-            if (transcript_node->strand == '-')
-            {
-                revcom(buffer, buffer_offset);
-            };
-            printf(">%s_transcript\n", transcript_node->transcript);
-            printf("%s\n", buffer);
-            free(exon_positions);
-
-            if (transcript_node->cds_number)
+                /* Exon */
+                buffer_offset = 0;
+                for (exon_index = 0; exon_index < 2 * transcript_node->exon_number; exon_index += 2)
+                {
+                    // printf("exon: %lu %lu\n", exon_positions[exon_index], exon_positions[exon_index + 1]);
+                    element_length = exon_positions[exon_index + 1] - exon_positions[exon_index] + 1;
+                    memcpy(buffer + buffer_offset, sequence + exon_positions[exon_index] - 1, element_length);
+                    buffer_offset += element_length;
+                };
+                buffer[buffer_offset] = 0;
+                if (transcript_node->strand == '-')
+                {
+                    revcom(buffer, buffer_offset);
+                };
+                printf(">%s\n", transcript_node->transcript);
+                printf("%s\n", buffer);
+            }
+            else if (type && transcript_node->cds_number)
             {
                 /* CDS */
                 buffer_offset = 0;
@@ -167,23 +175,29 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                 {
                     revcom(buffer, buffer_offset);
                 };
-                cds_prefix[(3 - phase) % 3] = 0;
-                printf(">%s_cds\n", transcript_node->transcript);
-                printf("%s%s\n", cds_prefix, buffer);
-
-                protein_prefix[phase ? 1 : 0] = 0;
-                size_t protein_offset = 0;
-                while (protein_offset < buffer_offset / 3)
+                if (type == 1)
                 {
-                    unsigned long codon_hash_value = CodonHash(buffer + protein_offset * 3);
-                    protein[protein_offset] = codon_hash2amino_acid[codon_hash_value < 64 ? codon_hash_value : 64];
-                    protein_offset++;
+                    cds_prefix[(3 - phase) % 3] = 0;
+                    printf(">%s\n", transcript_node->transcript);
+                    printf("%s%s\n", cds_prefix, buffer);
+                }
+                else
+                {
+                    protein_prefix[phase ? 1 : 0] = 0;
+                    size_t protein_offset = 0;
+                    while (protein_offset < buffer_offset / 3)
+                    {
+                        unsigned long codon_hash_value = CodonHash(buffer + protein_offset * 3);
+                        protein[protein_offset] = codon_hash2amino_acid[codon_hash_value < 64 ? codon_hash_value : 64];
+                        protein_offset++;
+                    };
+                    protein[protein_offset] = 0;
+                    printf(">%s\n", transcript_node->transcript);
+                    printf("%s%s\n", protein_prefix, protein);
                 };
-                protein[protein_offset] = 0;
-                printf(">%s_protein\n", transcript_node->transcript);
-                printf("%s%s\n", protein_prefix, protein);
-                free(cds_positions);
             };
+            free(exon_positions);
+            free(cds_positions);
         };
     };
     free(buffer);
@@ -193,7 +207,7 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
 
 int print_help()
 {
-    printf("Usage:\ngene_sequence -fasta FASTA -gff GFF\n");
+    printf("Usage:\ngene_sequence -fasta FASTA -gff GFF -type {transcript | cds | protein}.\n");
     exit(EXIT_SUCCESS);
 }
 
@@ -201,27 +215,42 @@ int main(int argc, char *argv[])
 {
     char fasta[FILE_NAME];
     char gff[FILE_NAME];
-    if (argc != 5)
-    {
-        print_help();
-    }
-    int ARGS = 0;
-    for (int arg_index = 0; arg_index < argc - 1; arg_index++)
+    int type; // 0: transcript, 1: cds, 2: protein
+    int nesscessary_parameters = 0;
+    for (int arg_index = 1; arg_index < argc - 1; arg_index += 2)
     {
         if (!strcmp(argv[arg_index], "-fasta"))
         {
             strncpy(fasta, argv[arg_index + 1], FILE_NAME - 1);
             fasta[FILE_NAME - 1] = 0;
-            ARGS++;
+            nesscessary_parameters++;
         }
         else if (!strcmp(argv[arg_index], "-gff"))
         {
             strncpy(gff, argv[arg_index + 1], FILE_NAME - 1);
             gff[FILE_NAME - 1] = 0;
-            ARGS++;
+            nesscessary_parameters++;
+        }
+        else if (!strcmp(argv[arg_index], "-type"))
+        {
+            if (!strcmp(argv[arg_index + 1], "transcript"))
+            {
+                type = 0;
+                nesscessary_parameters++;
+            }
+            else if (!strcmp(argv[arg_index + 1], "cds"))
+            {
+                type = 1;
+                nesscessary_parameters++;
+            }
+            else if (!strcmp(argv[arg_index + 1], "protein"))
+            {
+                type = 2;
+                nesscessary_parameters++;
+            };
         };
     };
-    if (ARGS != 2)
+    if (nesscessary_parameters != 3)
     {
         print_help();
     };
@@ -238,7 +267,7 @@ int main(int argc, char *argv[])
     size_t hash_size = 12582917ul;
     size_t max_sequence_length = read_fasta_file(fasta, &sequence_hash, hash_size);
     read_gff_file(gff, &transcript_hash, hash_size);
-    output(transcript_hash, sequence_hash, hash_size, max_sequence_length);
+    output(transcript_hash, sequence_hash, hash_size, max_sequence_length, type);
     free_fasta_hash(sequence_hash, hash_size);
     free_gff_hash(transcript_hash, hash_size);
     return 0;
