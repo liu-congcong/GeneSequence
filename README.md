@@ -1,12 +1,6 @@
 # GeneSequence
 
-Generate processed RNA sequences, CDS sequences and translated protein sequences of all transcripts:
-
-* X_**transcript**: processed RNA sequence of transcript X
-
-* X_**cds**: CDS sequence of transcript X
-
-* X_**protein**: protein sequence of transcript X
+Generate processed RNA sequences, CDS sequences and translated protein sequences of all transcripts.
 
 ## Installation
 
@@ -18,6 +12,20 @@ gcc *.c -o gene_sequence -lm
 
 ## Usage
 
+* Transcript Sequences
+
 ```shell
-gene_sequence -fasta FASTA -gff GFF > OUTPUT.FASTA
+gene_sequence -fasta FASTA -gff GFF -type transcript > TRANSCRIPT.FASTA
+```
+
+* CDS sequences
+
+```shell
+gene_sequence -fasta FASTA -gff GFF -type cds > CDS.FASTA
+```
+
+* Protein sequences
+
+```shell
+gene_sequence -fasta FASTA -gff GFF -type protein > PROTEIN.FASTA
 ```
