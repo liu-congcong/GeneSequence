@@ -50,6 +50,8 @@ size_t read_fasta_file(char *file, Sequence ***hash, size_t hash_size)
     size_t max_sequence_length = 0;
 
     FILE *open_file = fopen(file, "r");
+    fpos_t file_position;
+    fgetpos(open_file, &file_position);
     while (fgets(buffer, LINE, open_file))
     {
         buffer_size = strlen(buffer);
@@ -73,9 +75,7 @@ size_t read_fasta_file(char *file, Sequence ***hash, size_t hash_size)
     *sequence = 0;
     create_hash(hash, hash_size);
 
-    long long file_start = 0;
-    fsetpos(open_file, (const fpos_t *)&file_start);
-
+    fsetpos(open_file, &file_position);
     while (fgets(buffer, LINE, open_file))
     {
         buffer_size = strlen(buffer);
