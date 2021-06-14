@@ -12,7 +12,7 @@ gcc *.c -o gene_sequence -lm
 
 ## Usage
 
-* Transcript Sequences
+* Transcript sequences
 
 ```shell
 gene_sequence -fasta FASTA -gff GFF -type transcript > TRANSCRIPT.FASTA
