@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "fasta_reader.h"
 #include "hash.h"
 
@@ -14,6 +15,18 @@ static int create_hash(Sequence ***hash, unsigned long hash_size)
 static int add2hash(Sequence **hash, unsigned long hash_size, char *sequence_id, size_t sequence_id_length, char *sequence, size_t sequence_length)
 {
     unsigned long hash_value = ElfHash(sequence_id) % hash_size;
+    Sequence *node = hash[hash_value];
+    while (node)
+    {
+        if (node->next)
+        {
+            node = node->next;
+        }
+        else
+        {
+            break;
+        };
+    };
     Sequence *new_node = malloc(sizeof(Sequence));
     new_node->id = malloc(sequence_id_length + 1);
     strcpy(new_node->id, sequence_id);
@@ -21,19 +34,13 @@ static int add2hash(Sequence **hash, unsigned long hash_size, char *sequence_id,
     strcpy(new_node->sequence, sequence);
     new_node->length = sequence_length;
     new_node->next = NULL;
-
-    if (!hash[hash_value])
+    if (node)
     {
-        hash[hash_value] = new_node;
+        node->next = new_node;
     }
     else
     {
-        Sequence *node = hash[hash_value];
-        while (node->next)
-        {
-            node = node->next;
-        };
-        node->next = new_node;
+        hash[hash_value] = new_node;
     };
     return 0;
 }
