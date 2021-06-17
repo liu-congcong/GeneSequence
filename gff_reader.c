@@ -12,7 +12,7 @@ static int create_hash(Transcript ***hash, unsigned long hash_size)
     return 0;
 }
 
-static int add2hash(Transcript **hash, unsigned long hash_size, char *transcript, char *type, char strand, char *ref_name, unsigned long start, unsigned long end, char phase)
+static int add2hash(Transcript **hash, unsigned long hash_size, char *transcript, char type, char strand, char *ref_name, unsigned long start, unsigned long end, char phase)
 {
     int flag = false;
     unsigned long hash_value = ElfHash(transcript) % hash_size;
@@ -57,51 +57,51 @@ static int add2hash(Transcript **hash, unsigned long hash_size, char *transcript
         transcript_node = new_transcript_node;
     };
 
-    // Add exon or cds.
-    Element *element_node = malloc(sizeof(Element)); // New element node.
-    if (strcmp(type, "CDS"))
+    if (type == 'e')
     {
-        element_node->type = 0; // exon
-        transcript_node->exon_number += 1;
+        transcript_node->exon_number++;
     }
     else
     {
-        element_node->type = 1; // cds
-        transcript_node->cds_number += 1;
+        transcript_node->cds_number++;
     };
+
+    // Add exon or cds.
+    Element *new_element_node = malloc(sizeof(Element)); // New element node.
+    new_element_node->type = type;
     if (phase == '0' || phase == '.')
     {
-        element_node->phase = 0;
+        new_element_node->phase = 0;
     }
     else if (phase == '1')
     {
-        element_node->phase = 1;
+        new_element_node->phase = 1;
     }
     else
     {
-        element_node->phase = 2;
+        new_element_node->phase = 2;
     };
-    element_node->start = start;
-    element_node->end = end;
-    element_node->next = NULL;
+    new_element_node->start = start;
+    new_element_node->end = end;
+    new_element_node->next = NULL;
 
-    Element *element_node_ = transcript_node->element;
-    if (element_node_)
+    Element *element_node = transcript_node->element;
+    if (element_node)
     {
-        while (element_node_->next)
+        while (element_node->next)
         {
-            element_node_ = element_node_->next;
+            element_node = element_node->next;
         };
-        element_node_->next = element_node;
+        element_node->next = new_element_node;
     }
     else
     {
-        transcript_node->element = element_node;
+        transcript_node->element = new_element_node;
     };
     return 0;
 }
 
-int read_gff_file(char *file, Transcript ***hash, size_t hash_size)
+int read_gff_file(char *file, Transcript ***hash, unsigned long hash_size)
 {
     char buffer[LINE];
     char ref_name[LINE]; // 0
@@ -115,7 +115,7 @@ int read_gff_file(char *file, Transcript ***hash, size_t hash_size)
     char *sep = NULL;
     char *attributes_pointer = NULL;
 
-    size_t buffer_size = 0;
+    unsigned long buffer_size = 0;
     bool new_line = 1;
     const char *format = "%s\t%*[^\t]\t%s\t%lu\t%lu\t%*s\t%c\t%c\t%[^\n]";
     
@@ -139,7 +139,7 @@ int read_gff_file(char *file, Transcript ***hash, size_t hash_size)
                     };
                 };
                 // printf("type: %s, transcript: %s, strand: %c, ref_name: %s, start: %lu, end: %lu, attributes: %s\n", type, transcript, strand, ref_name, start, end, attributes);
-                add2hash(*hash, hash_size, transcript, type, strand, ref_name, start, end, phase);
+                add2hash(*hash, hash_size, transcript, strcmp(type, "CDS") ? 'e' : 'c', strand, ref_name, start, end, phase);
             };
         };
 
@@ -150,13 +150,13 @@ int read_gff_file(char *file, Transcript ***hash, size_t hash_size)
     return 0;
 }
 
-int free_gff_hash(Transcript **hash, size_t hash_size)
+int free_gff_hash(Transcript **hash, unsigned long hash_size)
 {
     Transcript *transcript_node = NULL;
     Transcript *transcript_node_ = NULL;
     Element *element_node = NULL;
     Element *element_node_ = NULL;
-    for (size_t hash_index = 0; hash_index < hash_size; hash_index++)
+    for (unsigned long hash_index = 0; hash_index < hash_size; hash_index++)
     {
         transcript_node = hash[hash_index];
         while (transcript_node)

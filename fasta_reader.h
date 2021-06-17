@@ -9,14 +9,14 @@
 typedef struct Sequence{
     char *id;
     char *sequence;
-    size_t length;
+    unsigned long length;
     struct Sequence *next;
 } Sequence;
 
-size_t read_fasta_file(char *, Sequence ***, size_t);
+unsigned long read_fasta_file(char *, Sequence ***, unsigned long);
 
-int free_fasta_hash(Sequence **, size_t);
+int free_fasta_hash(Sequence **, unsigned long);
 
-char *find_sequence(Sequence **, size_t, char *);
+char *find_sequence(Sequence **, unsigned long, char *);
 
 #endif

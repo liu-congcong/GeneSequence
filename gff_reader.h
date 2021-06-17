@@ -7,10 +7,10 @@
 #define FILE_NAME 10240
 
 typedef struct Element{ // exon or cds
-    short type;
+    char type;
     short phase;
-    size_t start;
-    size_t end;
+    unsigned long start;
+    unsigned long end;
     struct Element *next;
 } Element;
 
@@ -18,14 +18,14 @@ typedef struct Transcript{
     char *transcript;
     char *ref_name;
     char strand;
-    size_t exon_number;
-    size_t cds_number;
+    unsigned long exon_number;
+    unsigned long cds_number;
     struct Transcript *next;
     Element *element;
 } Transcript;
 
-int read_gff_file(char *, Transcript ***, size_t);
+int read_gff_file(char *, Transcript ***, unsigned long);
 
-int free_gff_hash(Transcript **, size_t);
+int free_gff_hash(Transcript **, unsigned long);
 
 #endif

@@ -12,7 +12,7 @@ static int create_hash(Sequence ***hash, unsigned long hash_size)
     return 0;
 }
 
-static int add2hash(Sequence **hash, unsigned long hash_size, char *sequence_id, size_t sequence_id_length, char *sequence, size_t sequence_length)
+static int add2hash(Sequence **hash, unsigned long hash_size, char *sequence_id, unsigned long sequence_id_length, char *sequence, unsigned long sequence_length)
 {
     unsigned long hash_value = ElfHash(sequence_id) % hash_size;
     Sequence *node = hash[hash_value];
@@ -45,16 +45,16 @@ static int add2hash(Sequence **hash, unsigned long hash_size, char *sequence_id,
     return 0;
 }
 
-size_t read_fasta_file(char *file, Sequence ***hash, size_t hash_size)
+unsigned long read_fasta_file(char *file, Sequence ***hash, unsigned long hash_size)
 {
     char buffer[LINE];
-    size_t buffer_size = 0;
-    size_t sequence_length = 0;
+    unsigned long buffer_size = 0;
+    unsigned long sequence_length = 0;
     char sequence_id[1024];
-    size_t sequence_id_length = 0;
+    unsigned long sequence_id_length = 0;
     char *sequence_id_blank = NULL;
     char *sequence = NULL;
-    size_t max_sequence_length = 0;
+    unsigned long max_sequence_length = 0;
 
     FILE *open_file = fopen(file, "r");
     fpos_t file_position;
@@ -125,10 +125,10 @@ size_t read_fasta_file(char *file, Sequence ***hash, size_t hash_size)
     return max_sequence_length;
 }
 
-int free_fasta_hash(Sequence **hash, size_t hash_size)
+int free_fasta_hash(Sequence **hash, unsigned long hash_size)
 {
     Sequence *temp = NULL;
-    for (size_t hash_index = 0; hash_index < hash_size; hash_index++)
+    for (unsigned long hash_index = 0; hash_index < hash_size; hash_index++)
     {
         while (hash[hash_index])
         {
@@ -143,7 +143,7 @@ int free_fasta_hash(Sequence **hash, size_t hash_size)
     return 0;
 }
 
-char *find_sequence(Sequence **hash, size_t hash_size, char *sequence_id)
+char *find_sequence(Sequence **hash, unsigned long hash_size, char *sequence_id)
 {
     unsigned long hash_value = ElfHash(sequence_id) % hash_size;
     char *sequence = NULL;

@@ -7,15 +7,15 @@
 #include "gff_reader.h"
 #include "hash.h"
 
-int compare (const void *number1, const void *number2)
+int compare (const void *x1, const void *x2)
 {
-    return (*(size_t *)number1 < *(size_t *)number2) ? -1 : 1;
+    return (*(unsigned long *)x1 < *(unsigned long *)x2) ? -1 : 1;
 }
 
-int revcom(char *string, size_t string_length)
+int revcom(char *string, unsigned long string_length)
 {
     char temp;
-    for (size_t index = 0; index < ceil(string_length / 2.0); index++)
+    for (unsigned long index = 0; index < ceil(string_length / 2.0); index++)
     {
         temp = string[index];
         switch (string[string_length - 1 - index])
@@ -82,7 +82,7 @@ int revcom(char *string, size_t string_length)
     return 0;
 }
 
-int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long hash_size, size_t max_sequence_length, int type)
+int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long hash_size, unsigned long max_sequence_length, int type)
 {
     char *buffer = malloc(sizeof(char) * (max_sequence_length + 1));
     char *protein = malloc(sizeof(char) * (max_sequence_length / 3 + 1));
@@ -90,21 +90,21 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
     char protein_prefix[2] = "x\0";
     char codon_hash2amino_acid[65] = "KNKNTTTTRSRSIIMIQHQHPPPPRRRRLLLLEDEDAAAAGGGGVVVVXYXYSSSSXCWCLFLFx";
 
-    for (size_t hash_index = 0; hash_index < hash_size; hash_index++)
+    for (unsigned long hash_index = 0; hash_index < hash_size; hash_index++)
     {
         for (Transcript *transcript_node = transcript_hash[hash_index]; transcript_node; transcript_node = transcript_node->next)
         {
             char *sequence = find_sequence(sequence_hash, hash_size, transcript_node->ref_name);
-            size_t *exon_positions = malloc(sizeof(size_t) * 2 * transcript_node->exon_number);
-            size_t exon_index = 0;
-            size_t *cds_positions = malloc(sizeof(size_t) * 2 * transcript_node->cds_number);
-            size_t cds_index = 0;
-            size_t min_cds_start = max_sequence_length;
-            size_t max_cds_start = 0;
+            unsigned long *exon_positions = malloc(sizeof(unsigned long) * 2 * transcript_node->exon_number);
+            unsigned long exon_index = 0;
+            unsigned long *cds_positions = malloc(sizeof(unsigned long) * 2 * transcript_node->cds_number);
+            unsigned long cds_index = 0;
+            unsigned long min_cds_start = max_sequence_length;
+            unsigned long max_cds_start = 0;
             short phase = 0;
             for (Element *element_node = transcript_node->element; element_node; element_node = element_node->next)
             {
-                if (element_node->type && type) // cds
+                if ((element_node->type == 'c') && type) // cds
                 {
                     cds_positions[cds_index] = element_node->start;
                     cds_positions[cds_index + 1] = element_node->end;
@@ -120,7 +120,7 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                     };
                     cds_index += 2;
                 }
-                else if ((!element_node->type) && (!type))
+                else if ((element_node->type == 'e') && (!type))
                 {
                     exon_positions[exon_index] = element_node->start;
                     exon_positions[exon_index + 1] = element_node->end;
@@ -129,16 +129,16 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
             };
             if (!type)
             {
-                qsort(exon_positions, 2 * transcript_node->exon_number, sizeof(size_t), compare);
+                qsort(exon_positions, 2 * transcript_node->exon_number, sizeof(unsigned long), compare);
             }
             else
             {
-                qsort(cds_positions, 2 * transcript_node->cds_number, sizeof(size_t), compare);
+                qsort(cds_positions, 2 * transcript_node->cds_number, sizeof(unsigned long), compare);
             };
             // printf("transcript: %s, #exon: %lu, #cds: %lu\n", transcript_node->transcript, transcript_node->exon_number, transcript_node->cds_number);
 
-            size_t element_length;
-            size_t buffer_offset;
+            unsigned long element_length;
+            unsigned long buffer_offset;
 
             if (!type) // transcript
             {
@@ -184,7 +184,7 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                 else
                 {
                     protein_prefix[phase ? 1 : 0] = 0;
-                    size_t protein_offset = 0;
+                    unsigned long protein_offset = 0;
                     while (protein_offset < buffer_offset / 3)
                     {
                         unsigned long codon_hash_value = CodonHash(buffer + protein_offset * 3);
@@ -207,7 +207,7 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
 
 int print_help()
 {
-    printf("Usage:\ngene_sequence -fasta FASTA -gff GFF -type {transcript | cds | protein}.\n");
+    printf("Usage:\nGeneSequence -fasta FASTA -gff GFF -type {transcript | cds | protein}.\n");
     exit(EXIT_SUCCESS);
 }
 
@@ -264,8 +264,8 @@ int main(int argc, char *argv[])
     3145739ul, 6291469ul, 12582917ul, 25165843ul, 50331653ul, 100663319ul,
     201326611ul, 402653189ul, 805306457ul, 1610612741ul, 3221225473ul, 4294967291ul
     */
-    size_t hash_size = 12582917ul;
-    size_t max_sequence_length = read_fasta_file(fasta, &sequence_hash, hash_size);
+    unsigned long hash_size = 12582917ul;
+    unsigned long max_sequence_length = read_fasta_file(fasta, &sequence_hash, hash_size);
     read_gff_file(gff, &transcript_hash, hash_size);
     output(transcript_hash, sequence_hash, hash_size, max_sequence_length, type);
     free_fasta_hash(sequence_hash, hash_size);
