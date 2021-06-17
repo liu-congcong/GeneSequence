@@ -7,7 +7,7 @@ Generate processed RNA sequences, CDS sequences and translated protein sequences
 ```shell
 git clone https://github.com/liu-congcong/GeneSequence.git
 cd GeneSequence
-gcc *.c -o gene_sequence -lm
+gcc *.c -o GeneSequence -lm
 ```
 
 ## Usage
@@ -15,17 +15,17 @@ gcc *.c -o gene_sequence -lm
 * Transcript sequences
 
 ```shell
-gene_sequence -fasta FASTA -gff GFF -type transcript > TRANSCRIPT.FASTA
+GeneSequence -fasta FASTA -gff GFF -type transcript > TRANSCRIPT.FASTA
 ```
 
 * CDS sequences
 
 ```shell
-gene_sequence -fasta FASTA -gff GFF -type cds > CDS.FASTA
+GeneSequence -fasta FASTA -gff GFF -type cds > CDS.FASTA
 ```
 
 * Protein sequences
 
 ```shell
-gene_sequence -fasta FASTA -gff GFF -type protein > PROTEIN.FASTA
+GeneSequence -fasta FASTA -gff GFF -type protein > PROTEIN.FASTA
 ```
