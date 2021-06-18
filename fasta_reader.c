@@ -15,33 +15,14 @@ static int create_hash(Sequence ***hash, unsigned long hash_size)
 static int add2hash(Sequence **hash, unsigned long hash_size, char *sequence_id, unsigned long sequence_id_length, char *sequence, unsigned long sequence_length)
 {
     unsigned long hash_value = ElfHash(sequence_id) % hash_size;
-    Sequence *node = hash[hash_value];
-    while (node)
-    {
-        if (node->next)
-        {
-            node = node->next;
-        }
-        else
-        {
-            break;
-        };
-    };
     Sequence *new_node = malloc(sizeof(Sequence));
     new_node->id = malloc(sequence_id_length + 1);
     strcpy(new_node->id, sequence_id);
     new_node->sequence = malloc(sequence_length + 1);
     strcpy(new_node->sequence, sequence);
     new_node->length = sequence_length;
-    new_node->next = NULL;
-    if (node)
-    {
-        node->next = new_node;
-    }
-    else
-    {
-        hash[hash_value] = new_node;
-    };
+    new_node->next = hash[hash_value];
+    hash[hash_value] = new_node;
     return 0;
 }
 
@@ -146,22 +127,14 @@ int free_fasta_hash(Sequence **hash, unsigned long hash_size)
 char *find_sequence(Sequence **hash, unsigned long hash_size, char *sequence_id)
 {
     unsigned long hash_value = ElfHash(sequence_id) % hash_size;
-    char *sequence = NULL;
-    if (hash[hash_value])
+    Sequence *sequence_node = hash[hash_value];
+    while (sequence_node)
     {
-        for (Sequence *sequence_node = hash[hash_value]; sequence_node; sequence_node = sequence_node->next)
+        if (!strcmp(sequence_node->id, sequence_id))
         {
-            if (!strcmp(sequence_node->id, sequence_id))
-            {
-                sequence = sequence_node->sequence;
-                break;
-            };
+            break;
         };
+        sequence_node = sequence_node->next;
     };
-    if (!sequence)
-    {
-        printf("Can not find the sequence '%s' in assembly file.\n", sequence_id);
-        exit(EXIT_FAILURE);
-    };
-    return sequence;
+    return sequence_node ? sequence_node->sequence : NULL;
 }

@@ -14,47 +14,30 @@ static int create_hash(Transcript ***hash, unsigned long hash_size)
 
 static int add2hash(Transcript **hash, unsigned long hash_size, char *transcript, char type, char strand, char *ref_name, unsigned long start, unsigned long end, char phase)
 {
-    int flag = false;
     unsigned long hash_value = ElfHash(transcript) % hash_size;
     Transcript *transcript_node = hash[hash_value];
     while (transcript_node)
     {
         if (!strcmp(transcript_node->transcript, transcript))
         {
-            flag = true;
-            break;
-        }
-        else if (transcript_node->next)
-        {
-            transcript_node = transcript_node->next;
-        }
-        else
-        {
             break;
         };
+        transcript_node = transcript_node->next;
     };
 
-    if (!flag) // Add Transcript node.
+    if (!transcript_node) // Add Transcript node.
     {
-        Transcript *new_transcript_node = malloc(sizeof(Transcript));
-        new_transcript_node->transcript = malloc(strlen(transcript) + 1);
-        strcpy(new_transcript_node->transcript, transcript);
-        new_transcript_node->ref_name = malloc(strlen(ref_name) + 1);
-        strcpy(new_transcript_node->ref_name, ref_name);
-        new_transcript_node->strand = strand;
-        new_transcript_node->exon_number = 0;
-        new_transcript_node->cds_number = 0;
-        new_transcript_node->next = NULL;
-        new_transcript_node->element = NULL;
-        if (transcript_node)
-        {
-            transcript_node->next = new_transcript_node;
-        }
-        else
-        {
-            hash[hash_value] = new_transcript_node;
-        };
-        transcript_node = new_transcript_node;
+        transcript_node = malloc(sizeof(Transcript));
+        transcript_node->transcript = malloc(strlen(transcript) + 1);
+        strcpy(transcript_node->transcript, transcript);
+        transcript_node->ref_name = malloc(strlen(ref_name) + 1);
+        strcpy(transcript_node->ref_name, ref_name);
+        transcript_node->strand = strand;
+        transcript_node->exon_number = 0;
+        transcript_node->cds_number = 0;
+        transcript_node->next = hash[hash_value];
+        transcript_node->element = NULL;
+        hash[hash_value] = transcript_node;
     };
 
     if (type == 'e')
@@ -67,37 +50,24 @@ static int add2hash(Transcript **hash, unsigned long hash_size, char *transcript
     };
 
     // Add exon or cds.
-    Element *new_element_node = malloc(sizeof(Element)); // New element node.
-    new_element_node->type = type;
+    Element *element_node = malloc(sizeof(Element)); // New element node.
+    element_node->type = type;
     if (phase == '0' || phase == '.')
     {
-        new_element_node->phase = 0;
+        element_node->phase = 0;
     }
     else if (phase == '1')
     {
-        new_element_node->phase = 1;
+        element_node->phase = 1;
     }
     else
     {
-        new_element_node->phase = 2;
+        element_node->phase = 2;
     };
-    new_element_node->start = start;
-    new_element_node->end = end;
-    new_element_node->next = NULL;
-
-    Element *element_node = transcript_node->element;
-    if (element_node)
-    {
-        while (element_node->next)
-        {
-            element_node = element_node->next;
-        };
-        element_node->next = new_element_node;
-    }
-    else
-    {
-        transcript_node->element = new_element_node;
-    };
+    element_node->start = start;
+    element_node->end = end;
+    element_node->next = transcript_node->element;
+    transcript_node->element = element_node;
     return 0;
 }
 
