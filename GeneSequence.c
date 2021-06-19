@@ -47,7 +47,7 @@ int revcom(char *string, unsigned long string_length)
             default:
                 string[index] = string[string_length - 1 - index];
                 break;
-        };
+        }
         switch (temp)
         {
             case 'A':
@@ -77,8 +77,8 @@ int revcom(char *string, unsigned long string_length)
             default:
                 string[string_length - 1 - index] = temp;
                 break;
-        };
-    };
+        }
+    }
     return 0;
 }
 
@@ -119,7 +119,7 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                         {
                             phase = element_node->phase;
                             max_cds_start = cds_positions[cds_index];
-                        };
+                        }
                         cds_index += 2;
                     }
                     else if ((element_node->type == 'e') && (!type))
@@ -127,8 +127,8 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                         exon_positions[exon_index] = element_node->start;
                         exon_positions[exon_index + 1] = element_node->end;
                         exon_index += 2;
-                    };
-                };
+                    }
+                }
                 if (!type)
                 {
                     qsort(exon_positions, 2 * transcript_node->exon_number, sizeof(unsigned long), compare);
@@ -136,7 +136,7 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                 else
                 {
                     qsort(cds_positions, 2 * transcript_node->cds_number, sizeof(unsigned long), compare);
-                };
+                }
                 // printf("transcript: %s, #exon: %lu, #cds: %lu\n", transcript_node->transcript, transcript_node->exon_number, transcript_node->cds_number);
 
                 unsigned long element_length;
@@ -152,12 +152,12 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                         element_length = exon_positions[exon_index + 1] - exon_positions[exon_index] + 1;
                         memcpy(buffer + buffer_offset, sequence + exon_positions[exon_index] - 1, element_length);
                         buffer_offset += element_length;
-                    };
+                    }
                     buffer[buffer_offset] = 0;
                     if (transcript_node->strand == '-')
                     {
                         revcom(buffer, buffer_offset);
-                    };
+                    }
                     printf(">%s\n", transcript_node->transcript);
                     printf("%s\n", buffer);
                 }
@@ -171,12 +171,12 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                         element_length = cds_positions[cds_index + 1] - cds_positions[cds_index] + 1;
                         memcpy(buffer + buffer_offset, sequence + cds_positions[cds_index] - 1, element_length);
                         buffer_offset += element_length;
-                    };
+                    }
                     buffer[buffer_offset] = 0;
                     if (transcript_node->strand == '-')
                     {
                         revcom(buffer, buffer_offset);
-                    };
+                    }
                     if (type == 1)
                     {
                         cds_prefix[(3 - phase) % 3] = 0;
@@ -192,17 +192,17 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
                             unsigned long codon_hash_value = CodonHash(buffer + protein_offset * 3);
                             protein[protein_offset] = codon_hash2amino_acid[codon_hash_value < 64 ? codon_hash_value : 64];
                             protein_offset++;
-                        };
+                        }
                         protein[protein_offset] = 0;
                         printf(">%s\n", transcript_node->transcript);
                         printf("%s%s\n", protein_prefix, protein);
-                    };
-                };
+                    }
+                }
                 free(exon_positions);
                 free(cds_positions);
-            };
-        };
-    };
+            }
+        }
+    }
     free(buffer);
     free(protein);
     return 0;
@@ -250,13 +250,13 @@ int main(int argc, char *argv[])
             {
                 type = 2;
                 nesscessary_parameters++;
-            };
-        };
-    };
+            }
+        }
+    }
     if (nesscessary_parameters != 3)
     {
         print_help();
-    };
+    }
     //char *fasta = "fasta";
     //char *gff = "gff";
     Transcript **transcript_hash = NULL;

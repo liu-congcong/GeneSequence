@@ -47,7 +47,7 @@ unsigned long read_fasta_file(char *file, Sequence ***hash, unsigned long hash_s
         {
             buffer[buffer_size - 1] = 0;
             buffer_size--;
-        };
+        }
         if (buffer[0] == '>')
         {
             max_sequence_length = max_sequence_length > sequence_length ? max_sequence_length : sequence_length;
@@ -55,8 +55,8 @@ unsigned long read_fasta_file(char *file, Sequence ***hash, unsigned long hash_s
         }
         else{
             sequence_length += buffer_size;
-        };
-    };
+        }
+    }
     max_sequence_length = max_sequence_length > sequence_length ? max_sequence_length : sequence_length;
 
     sequence = malloc(sizeof(char) * (max_sequence_length + 1));
@@ -71,20 +71,20 @@ unsigned long read_fasta_file(char *file, Sequence ***hash, unsigned long hash_s
         {
             buffer[buffer_size - 1] = 0;
             buffer_size--;
-        };
+        }
         if (buffer[0] == '>')
         {
             if (*sequence != 0)
             {
                 add2hash(*hash, hash_size, sequence_id, sequence_id_length, sequence, sequence_length);
                 *sequence = 0;
-            };
+            }
 
             sequence_id_blank = strchr(buffer, ' ');
             if (sequence_id_blank)
             {
                 *sequence_id_blank = 0;
-            };
+            }
             sequence_id_length = buffer_size - 1;
             strcpy(sequence_id, buffer + 1); // >sequence_id\0
             sequence_id[1023] = 0;
@@ -94,13 +94,13 @@ unsigned long read_fasta_file(char *file, Sequence ***hash, unsigned long hash_s
         {
             strcat(sequence + sequence_length, buffer);
             sequence_length += buffer_size;
-        };
-    };
+        }
+    }
     if (*sequence != 0)
     {
         add2hash(*hash, hash_size, sequence_id, sequence_id_length, sequence, sequence_length);
         *sequence = 0;
-    };
+    }
     free(sequence);
     fclose(open_file);
     return max_sequence_length;
@@ -118,8 +118,8 @@ int free_fasta_hash(Sequence **hash, unsigned long hash_size)
             free(hash[hash_index]->sequence);
             free(hash[hash_index]);
             hash[hash_index] = temp;
-        };
-    };
+        }
+    }
     free(hash);
     return 0;
 }
@@ -133,8 +133,8 @@ char *find_sequence(Sequence **hash, unsigned long hash_size, char *sequence_id)
         if (!strcmp(sequence_node->id, sequence_id))
         {
             break;
-        };
+        }
         sequence_node = sequence_node->next;
-    };
+    }
     return sequence_node ? sequence_node->sequence : NULL;
 }

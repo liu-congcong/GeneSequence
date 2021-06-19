@@ -21,9 +21,9 @@ static int add2hash(Transcript **hash, unsigned long hash_size, char *transcript
         if (!strcmp(transcript_node->transcript, transcript))
         {
             break;
-        };
+        }
         transcript_node = transcript_node->next;
-    };
+    }
 
     if (!transcript_node) // Add Transcript node.
     {
@@ -38,7 +38,7 @@ static int add2hash(Transcript **hash, unsigned long hash_size, char *transcript
         transcript_node->next = hash[hash_value];
         transcript_node->element = NULL;
         hash[hash_value] = transcript_node;
-    };
+    }
 
     if (type == 'e')
     {
@@ -47,7 +47,7 @@ static int add2hash(Transcript **hash, unsigned long hash_size, char *transcript
     else
     {
         transcript_node->cds_number++;
-    };
+    }
 
     // Add exon or cds.
     Element *element_node = malloc(sizeof(Element)); // New element node.
@@ -63,7 +63,7 @@ static int add2hash(Transcript **hash, unsigned long hash_size, char *transcript
     else
     {
         element_node->phase = 2;
-    };
+    }
     element_node->start = start;
     element_node->end = end;
     element_node->next = transcript_node->element;
@@ -106,16 +106,16 @@ int read_gff_file(char *file, Transcript ***hash, unsigned long hash_size)
                     {
                         strcpy(transcript, sep + 7);
                         break;
-                    };
-                };
+                    }
+                }
                 // printf("type: %s, transcript: %s, strand: %c, ref_name: %s, start: %lu, end: %lu, attributes: %s\n", type, transcript, strand, ref_name, start, end, attributes);
                 add2hash(*hash, hash_size, transcript, strcmp(type, "CDS") ? 'e' : 'c', strand, ref_name, start, end, phase);
-            };
-        };
+            }
+        }
 
         buffer_size = strlen(buffer);
         new_line = buffer[buffer_size - 1] == '\n' ? 1 : 0;
-    };
+    }
     fclose(open_file);
     return 0;
 }
@@ -140,11 +140,11 @@ int free_gff_hash(Transcript **hash, unsigned long hash_size)
                 element_node_ = element_node->next;
                 free(element_node);
                 element_node = element_node_;
-            };
+            }
             free(transcript_node);
             transcript_node = transcript_node_;
-        };
-    };
+        }
+    }
     free(hash);
     return 0;
 }

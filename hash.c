@@ -17,7 +17,7 @@ unsigned long ElfHash(char *string)
         if (high)
         {
             hash ^= high >> 24;
-        };
+        }
         hash &= ~high;
     }
     return hash;
@@ -57,7 +57,7 @@ unsigned long CodonHash(char *codon) // 0 - 63
             default:
                 hash += 64; // Invalid hash value.
                 break;
-        };
-    };
+        }
+    }
     return hash;
 }
