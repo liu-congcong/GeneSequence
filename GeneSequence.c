@@ -208,9 +208,9 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
     return 0;
 }
 
-int print_help()
+int print_help(char *program)
 {
-    printf("Usage:\nGeneSequence -fasta FASTA -gff GFF -type {transcript | cds | protein}.\n");
+    printf("Usage:\n%s -fasta FASTA -gff GFF -type {transcript | cds | protein}.\n", program);
     exit(EXIT_SUCCESS);
 }
 
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
     }
     if (nesscessary_parameters != 3)
     {
-        print_help();
+        print_help(argv[0]);
     }
     //char *fasta = "fasta";
     //char *gff = "gff";
