@@ -211,7 +211,7 @@ int output(Transcript **transcript_hash, Sequence **sequence_hash, unsigned long
 int print_help(char *program)
 {
     printf("Usage:\n%s -fasta FASTA -gff GFF -type {transcript | cds | protein}.\n", program);
-    exit(EXIT_SUCCESS);
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -220,22 +220,25 @@ int main(int argc, char *argv[])
     char gff[FILE_NAME];
     int type; // 0: transcript, 1: cds, 2: protein
     int nesscessary_parameters = 0;
-    for (int arg_index = 1; arg_index < argc - 1; arg_index += 2)
+    for (int arg_index = 1; arg_index < argc; arg_index++)
     {
         if (!strcmp(argv[arg_index], "-fasta"))
         {
+            assert(arg_index + 1 < argc);
             strncpy(fasta, argv[arg_index + 1], FILE_NAME - 1);
             fasta[FILE_NAME - 1] = 0;
             nesscessary_parameters++;
         }
         else if (!strcmp(argv[arg_index], "-gff"))
         {
+            assert(arg_index + 1 < argc);
             strncpy(gff, argv[arg_index + 1], FILE_NAME - 1);
             gff[FILE_NAME - 1] = 0;
             nesscessary_parameters++;
         }
         else if (!strcmp(argv[arg_index], "-type"))
         {
+            assert(arg_index + 1 < argc);
             if (!strcmp(argv[arg_index + 1], "transcript"))
             {
                 type = 0;
@@ -253,20 +256,16 @@ int main(int argc, char *argv[])
             }
         }
     }
+
     if (nesscessary_parameters != 3)
     {
         print_help(argv[0]);
+        exit(0);
     }
-    //char *fasta = "fasta";
-    //char *gff = "gff";
+
     Transcript **transcript_hash = NULL;
     Sequence **sequence_hash = NULL;
-    /*
-    53ul, 97ul, 193ul, 389ul, 769ul, 1543ul, 3079ul, 6151ul, 12289ul
-    24593ul, 49157ul, 98317ul, 196613ul, 393241ul, 786433ul, 1572869ul,
-    3145739ul, 6291469ul, 12582917ul, 25165843ul, 50331653ul, 100663319ul,
-    201326611ul, 402653189ul, 805306457ul, 1610612741ul, 3221225473ul, 4294967291ul
-    */
+
     unsigned long hash_size = 12582917ul;
     unsigned long max_sequence_length = read_fasta_file(fasta, &sequence_hash, hash_size);
     read_gff_file(gff, &transcript_hash, hash_size);
