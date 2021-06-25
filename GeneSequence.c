@@ -220,36 +220,36 @@ int main(int argc, char *argv[])
     char gff[FILE_NAME];
     int type; // 0: transcript, 1: cds, 2: protein
     int nesscessary_parameters = 0;
-    for (int arg_index = 1; arg_index < argc; arg_index++)
+    for (int index = 1; index < argc; index++)
     {
-        if (!strcmp(argv[arg_index], "-fasta"))
+        if (!strcmp(argv[index], "-fasta"))
         {
-            assert(arg_index + 1 < argc);
-            strncpy(fasta, argv[arg_index + 1], FILE_NAME - 1);
+            assert(index + 1 < argc);
+            strncpy(fasta, argv[index + 1], FILE_NAME - 1);
             fasta[FILE_NAME - 1] = 0;
             nesscessary_parameters++;
         }
-        else if (!strcmp(argv[arg_index], "-gff"))
+        else if (!strcmp(argv[index], "-gff"))
         {
-            assert(arg_index + 1 < argc);
-            strncpy(gff, argv[arg_index + 1], FILE_NAME - 1);
+            assert(index + 1 < argc);
+            strncpy(gff, argv[index + 1], FILE_NAME - 1);
             gff[FILE_NAME - 1] = 0;
             nesscessary_parameters++;
         }
-        else if (!strcmp(argv[arg_index], "-type"))
+        else if (!strcmp(argv[index], "-type"))
         {
-            assert(arg_index + 1 < argc);
-            if (!strcmp(argv[arg_index + 1], "transcript"))
+            assert(index + 1 < argc);
+            if (!strcmp(argv[index + 1], "transcript"))
             {
                 type = 0;
                 nesscessary_parameters++;
             }
-            else if (!strcmp(argv[arg_index + 1], "cds"))
+            else if (!strcmp(argv[index + 1], "cds"))
             {
                 type = 1;
                 nesscessary_parameters++;
             }
-            else if (!strcmp(argv[arg_index + 1], "protein"))
+            else if (!strcmp(argv[index + 1], "protein"))
             {
                 type = 2;
                 nesscessary_parameters++;
