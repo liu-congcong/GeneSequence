@@ -7,7 +7,7 @@ Generate processed RNA sequences, CDS sequences and translated protein sequences
 ```shell
 git clone https://github.com/liu-congcong/GeneSequence.git
 cd GeneSequence
-gcc *.c -o GeneSequence -lm
+make && make clean
 ```
 
 ## Usage

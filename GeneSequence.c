@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <math.h>
+#include <assert.h>
 #include "fasta_reader.h"
 #include "gff_reader.h"
 #include "hash.h"
